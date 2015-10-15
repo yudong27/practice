@@ -1,0 +1,166 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 10000
+#define LEN_IN_INT 4
+typedef struct bigfloat_
+{
+	int* integ;
+	int  integ_len;
+	int  flno;
+}bigflt;
+
+bigflt* str2bigflt(char* str,int start,int end);
+int pow_int(int x, int y);
+bigflt* multiply(bigflt* a,bigflt* b);
+void showbigflt(bigflt* bf);
+int main()
+{
+	char a[]="1555554445554454456431311.5454465441111664646464162";
+	char b[]="24164646844646131346466.31132114464164664351446546464634";
+	bigflt* bfa;
+	bigflt* bfb;
+	bigflt* bfc;
+	bfa=str2bigflt(a,0,strlen(a)-1);
+	bfb=str2bigflt(b,0,strlen(b)-1);
+	showbigflt(bfa);
+	showbigflt(bfb);
+	bfc=multiply(bfa,bfb);
+	showbigflt(bfc);
+	getchar();
+}
+
+bigflt* newbigflt(int n)
+{
+	bigflt* newone;
+	int i;
+	newone=(bigflt*)malloc(sizeof(bigflt));
+	newone->integ=(int*)malloc(sizeof(int)*n);
+	for(i=0;i<n;i++)
+		newone->integ[i]=0;
+	newone->integ_len=n;
+	newone->flno=0;
+	return newone;
+}
+void delbigflt(bigflt* bf)
+{
+	free(bf->integ);
+	free(bf);
+}
+
+bigflt* str2bigflt(char* str,int start,int end)
+{
+	int i,sum,noc,j;
+	bigflt* bf;
+	bf=newbigflt((end-start)/4+1);
+	sum=noc=0;
+	for(i=end,j=0;i>=start;i--)
+	{
+		if((str[i]>='0')&&(str[i]<='9'))
+		{
+			sum=sum+(str[i]-'0')*pow_int(10,noc);
+			noc++;
+			if(noc==4)
+			{
+				bf->integ[j]=sum;
+				sum=0;
+				noc=0;
+				j++;
+			}
+			if(i==start)
+			{
+				bf->integ[j]=sum;
+			}
+		}
+		else if(str[i]=='.')
+		{
+			bf->flno=end-i;
+		}
+		else
+		{
+			printf("Could not be a number:%s\n",str);
+			exit(-1);
+		}
+	}
+	return bf;
+}
+
+bigflt* multiply(bigflt* a,bigflt* b)
+{
+	bigflt* result;
+	int i,j,mul;
+	result=newbigflt(a->integ_len+b->integ_len+2);
+	result->flno=a->flno+b->flno;
+	for(i=0;i<a->integ_len;i++)
+		for(j=0;j<b->integ_len;j++)
+		{
+			result->integ[i+j]+=a->integ[i]*b->integ[j];
+			if(result->integ[i+j]>=pow_int(10,LEN_IN_INT))
+			{
+				result->integ[i+j+1]+=result->integ[i+j]/pow_int(10,LEN_IN_INT);
+				result->integ[i+j]=result->integ[i+j]%pow_int(10,LEN_IN_INT);
+			}
+		}
+		return result;
+}
+
+void showbigflt(bigflt* bf)
+{
+	int i,j,k,tmp,fstno;
+	int* res;
+	int fstnotzero=0;
+	int res_len=(LEN_IN_INT*bf->integ_len)+1;
+	res=(int*)malloc(sizeof(int)*res_len);
+	for(i=0;i<res_len;i++)
+		res[i]=0;
+	k=0;
+	for(i=0;i<bf->integ_len;i++)
+	{
+		tmp=bf->integ[i];
+		for(j=0;j<LEN_IN_INT;j++)
+		{
+			res[k]=tmp%10;
+			tmp=tmp/10;
+			k++;
+		}
+	}
+//	for(i=0;i<res_len;i++)
+//		printf("%d",res[i]);
+//	printf("\n");
+//	printf("bf->len=%d\n",bf->integ_len);
+//	printf("bf->fln=%d\n",bf->flno);
+	for(i=res_len-1;i>=0;i--)
+	{
+		if(res[i]!=0)
+		{
+			fstno=i;
+			break;
+		}
+	}
+//	printf("notzero=%d pointpos=%d\n",fstno,bf->flno);
+	if(fstno>bf->flno-1)
+	{
+		for(i=fstno;i>=0;i--)
+		{
+			printf("%d",res[i]);
+			if(i==bf->flno)
+				printf(".");
+		}
+		printf("\n");
+	}
+	else
+	{
+		printf("0.");
+		for(i=bf->flno-1;i>=0;i--)
+			printf("%d",res[i]);
+		printf("\n");
+	}
+}
+int pow_int(int x, int y)
+{
+    int r = 1;
+    while(y--) r*=x;
+    
+    return r;
+}
