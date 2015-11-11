@@ -1,0 +1,208 @@
+#include <iostream>
+#define ll long long
+
+using namespace std;
+typedef enum {OUT,INNER} Pos;
+typedef enum {LEFT,RIGHT,UP,DOWN} Direction;
+const ll RU=1000;
+
+inline Pos InOrOut(ll x1,ll y1,ll xc,ll yc,ll r,ll *dis)
+{
+	Pos pos;
+	ll distance=(x1-xc)*(x1-xc)+(y1-yc)*(y1-yc);
+	if(distance>r*r)
+		pos=OUT;
+	else
+		pos=INNER;
+	*dis=distance;
+	return pos;
+}
+inline ll str2ll(char str[],const int n)
+{
+	ll tmp=0;
+	int i=0,j=0;
+	for(i=0;i<n;i++)
+	{
+		if((str[i]<='9')&&(str[i]>='0'))
+			tmp=tmp*10+str[i]-'0';
+		else
+			break;
+	}
+	if((n-i)>3)
+	{
+		for(j=i+1;j<=i+3;j++)
+			tmp=tmp*10+str[j]-'0';
+	}
+	else
+	{
+		for(j=i+1;j<n;j++)
+			tmp=tmp*10+str[j]-'0';
+		if((n-i)==3)
+			tmp=tmp*10;
+		else if((n-i)==2)
+			tmp=tmp*100;
+		else if((n-i)==1)
+			tmp=tmp*1000;
+	}
+	return tmp;
+}
+int main()
+{
+	ll xc,yc,r;
+	ll x,y,distance;
+	ll xmax,ymax,dismax=0;
+	char xd[15],yd[15],rd[15];
+	Pos posz;
+	Direction drc;
+	cin>>xd>>yd>>rd;
+	xc=str2ll(xd,strlen(xd));
+	yc=str2ll(yd,strlen(yd));
+	r=str2ll(rd,strlen(rd));
+
+	//goto right at the bottom
+	x=(xc-r)/RU*RU-RU;
+	y=yc/RU*RU;
+	posz=OUT;
+	drc=DOWN;
+	dismax=0;
+	while(x<=(xc+r))
+	{
+		if(InOrOut(x,y,xc,yc,r,&distance)==OUT)
+		{
+			if(x<xc)
+			{
+				x+=RU;
+				continue;
+			}
+			if(drc==RIGHT)
+			{
+				drc=UP;
+				y+=RU;
+			}
+			else if(drc==UP)
+			{
+				y+=RU;
+			}
+			else if(drc==DOWN)
+			{
+				drc=RIGHT;
+				x+=RU;
+			}
+		}
+		else //inside
+		{
+			if(distance>dismax)
+			{
+				xmax=x;
+				ymax=y;
+				dismax=distance;
+			}
+			else if(distance==dismax)
+			{
+				if(x>xmax)
+				{
+					xmax=x;
+					ymax=y;
+					dismax=distance;
+				}
+				else if(x==xmax)
+				{
+					if(y>ymax)
+					{
+						xmax=x;
+						ymax=y;
+						dismax=distance;
+					}
+				}
+			}
+			if(drc==RIGHT)
+			{
+				drc=DOWN;
+				y-=RU;
+			}
+			else if(drc==UP)
+			{
+				drc=RIGHT;
+				x+=RU;
+			}
+			else if(drc==DOWN)
+			{
+				y-=RU;
+			}
+		}
+	}
+
+	//goto right at the up
+	x=(xc-r)/RU*RU-RU;
+	y=yc/RU*RU+RU;
+	posz=OUT;
+	drc=UP;
+	while(x<=(xc+r))
+	{
+		if(InOrOut(x,y,xc,yc,r,&distance)==OUT)
+		{
+			if(x<xc)
+			{
+				x+=RU;
+				continue;
+			}
+			if(drc==RIGHT)
+			{
+				drc=DOWN;
+				y-=RU;
+			}
+			else if(drc==UP)
+			{
+				drc=RIGHT;
+				x+=RU;
+			}
+			else if(drc==DOWN)
+			{
+				y-=RU;
+			}
+		}
+		else //inside
+		{
+			if(distance>dismax)
+			{
+				xmax=x;
+				ymax=y;
+				dismax=distance;
+			}
+			else if(distance==dismax)
+			{
+				if(x>xmax)
+				{
+					xmax=x;
+					ymax=y;
+					dismax=distance;
+				}
+				else if(x==xmax)
+				{
+					if(y>ymax)
+					{
+						xmax=x;
+						ymax=y;
+						dismax=distance;
+					}
+				}
+			}
+			if(drc==RIGHT)
+			{
+				drc=UP;
+				y+=RU;
+			}
+			else if(drc==UP)
+			{
+				y+=RU;
+			}
+			else if(drc==DOWN)
+			{
+				drc=RIGHT;
+				x+=RU;
+			}
+		}
+	}
+	cout<<xmax/RU<<" "<<ymax/RU<<endl;
+}
+
