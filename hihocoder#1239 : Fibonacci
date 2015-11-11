@@ -1,0 +1,58 @@
+#include <iostream>
+#define MOD 1000000007
+using namespace std;
+int getfibid(int number)
+{
+	int i;
+	int fib[24]={1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233,
+		377,610,987,1597,2584,4181,6765,10946,17711,
+		28657,46368,75025};
+	for(i=0;i<24;i++)
+	{
+		if(number==fib[i])
+			return i;
+	}
+	return -1;
+}
+int main()
+{
+	int n;
+	long long fibcount[30];
+	long long allcount=0;
+	for(int i=0;i<30;i++)
+		fibcount[i]=0;
+	cin>>n;
+	int number;
+	for(int i=0;i<n;i++)
+	{
+		cin>>number;
+		if(number==1)
+		{
+			fibcount[0]++;
+			fibcount[0]%=MOD;
+		}
+		else if((number==2)&&(fibcount[0]>1))
+		{
+			fibcount[1]+=(fibcount[0]-1)*fibcount[0]/2;
+			fibcount[1]%=MOD;
+		}
+		else
+		{
+			int id=getfibid(number);
+			if(id>1)
+			{
+				fibcount[id]+=fibcount[id-1];
+				fibcount[id]%=MOD;
+			}
+		}
+	}
+	for(int i=0;i<30;i++)
+	{
+		if(i==0)
+			allcount=(fibcount[0]+1)*fibcount[0]/2;
+		else
+			allcount+=fibcount[i];
+		allcount=allcount%MOD;
+	}
+	cout<<allcount<<endl;
+}
